@@ -12,7 +12,6 @@ header('Content-Type: application/json');
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Normalisasi path agar kompatibel dengan Vercel
-// Karena Vercel biasanya menghasilkan URI seperti /index.php/mahasiswa
 $uri = str_replace('/index.php', '', $uri);
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -22,6 +21,7 @@ $input = json_decode(file_get_contents("php://input"), true);
 
 // Routing utama
 switch (true) {
+
     // Root route
     case $uri === '/':
         echo json_encode(["message" => "Koneksi success"]);
@@ -33,8 +33,8 @@ switch (true) {
         (new MahasiswaController())->index();
         break;
 
-    // GET mahasiswa by ID
-    case preg_match('#^/mahasiswa/(\d+)$#', $uri, $matches) && $method === 'GET':
+    // GET mahasiswa berdasarkan ID
+    case preg_match('#^/mahasiswa/([0-9]+)$#', $uri, $matches) && $method === 'GET':
         $auth->verify();
         (new MahasiswaController())->show($matches[1]);
         break;
@@ -46,18 +46,18 @@ switch (true) {
         break;
 
     // PUT update mahasiswa
-    case preg_match('#^/mahasiswa/(\d+)$#', $uri, $matches) && $method === 'PUT':
+    case preg_match('#^/mahasiswa/([0-9]+)$#', $uri, $matches) && $method === 'PUT':
         $auth->verify();
         (new MahasiswaController())->update($matches[1]);
         break;
 
     // DELETE mahasiswa
-    case preg_match('#^/mahasiswa/(\d+)$#', $uri, $matches) && $method === 'DELETE':
+    case preg_match('#^/mahasiswa/([0-9]+)$#', $uri, $matches) && $method === 'DELETE':
         $auth->verify();
         (new MahasiswaController())->destroy($matches[1]);
         break;
 
-    // Default route jika tidak ditemukan
+    // Default route
     default:
         http_response_code(404);
         echo json_encode([
